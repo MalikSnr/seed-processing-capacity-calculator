@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Estimate daily and annual seed processing capacity based on machine throughput and operating hours.">
+  <title>Seed Processing Capacity Calculator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 32px 16px;
+      font-family: Arial, sans-serif;
+      background: #f4f7f4; color: #17251d;
+    }
+    main {
+      max-width: 760px; margin: auto; padding: 28px;
+      background: #fff; border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.07);
+    }
+    h1 { margin-top: 0; color: #17643d; }
+    p { line-height: 1.6; color: #536157; }
+    label { display: block; margin: 18px 0 7px; font-weight: 700; }
+    input, select {
+      width: 100%; padding: 13px; border: 1px solid #ccd6ce;
+      border-radius: 9px; font-size: 16px; background: white;
+    }
+    button {
+      width: 100%; margin-top: 24px; padding: 14px;
+      background: #17643d; color: white; border: 0;
+      border-radius: 9px; font-size: 16px; font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: #104b2d; }
+    .results {
+      margin-top: 24px; padding: 20px;
+      background: #edf7ef; border-radius: 12px;
+    }
+    .result {
+      display: flex; justify-content: space-between; gap: 16px;
+      padding: 12px 0; border-bottom: 1px solid #d3e5d6;
+    }
+    .result:last-child { border-bottom: 0; }
+    .value { font-weight: 700; text-align: right; color: #17643d; }
+    footer { margin-top: 22px; font-size: 13px; color: #6c786f; }
+    @media (max-width: 480px) {
+      main { padding: 20px; }
+      .result { flex-direction: column; gap: 5px; }
+      .value { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Seed Processing Capacity Calculator</h1>
+  <p>Estimate your seed processing output using machine capacity and operating schedules. Results are planning estimates, not guaranteed production figures.</p>
+
+  <label for="capacity">Machine capacity (tons per hour)</label>
+  <input id="capacity" type="number" min="0.01" step="any" value="5">
+
+  <label for="hours">Operating hours per day</label>
+  <input id="hours" type="number" min="0.01" max="24" step="any" value="8">
+
+  <label for="days">Operating days per year</label>
+  <input id="days" type="number" min="1" max="366" step="1" value="250">
+
+  <label for="efficiency">Estimated operating efficiency</label>
+  <select id="efficiency">
+    <option value="1">100% — ideal conditions</option>
+    <option value="0.9" selected>90% — typical planning estimate</option>
+    <option value="0.8">80% — conservative estimate</option>
+    <option value="0.7">70% — frequent interruptions</option>
+  </select>
+
+  <button type="button" id="calculate">Calculate capacity</button>
+
+  <section class="results" aria-live="polite">
+    <div class="result"><span>Estimated hourly output</span><span class="value" id="hourly">4.50 tons</span></div>
+    <div class="result"><span>Estimated daily output</span><span class="value" id="daily">36.00 tons</span></div>
+    <div class="result"><span>Estimated annual output</span><span class="value" id="annual">9,000.00 tons</span></div>
+  </section>
+
+  <footer>
+    Estimates assume the selected efficiency remains constant. Actual output depends on seed type, moisture, machine settings, downtime and process configuration.
+    <br><br>
+    More information: <a href="https://seedprocessingmachines.com/en/">Seed Processing Machines</a>
+  </footer>
+</main>
+
+<script>
+  const capacity = document.getElementById('capacity');
+  const hours = document.getElementById('hours');
+  const days = document.getElementById('days');
+  const efficiency = document.getElementById('efficiency');
+
+  function format(value) {
+    return value.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + ' tons';
+  }
+
+  function calculate() {
+    const c = Number(capacity.value);
+    const h = Number(hours.value);
+    const d = Number(days.value);
+    const e = Number(efficiency.value);
+
+    if (!Number.isFinite(c) || !Number.isFinite(h) ||
+        !Number.isFinite(d) || c <= 0 || h <= 0 ||
+        h > 24 || d < 1 || d > 366 || !Number.isInteger(d)) {
+      alert('Enter a positive capacity, 0–24 operating hours, and 1–366 whole operating days.');
+      return;
+    }
+
+    document.getElementById('hourly').textContent = format(c * e);
+    document.getElementById('daily').textContent = format(c * e * h);
+    document.getElementById('annual').textContent = format(c * e * h * d);
+  }
+
+  document.getElementById('calculate').addEventListener('click', calculate);
+  calculate();
+</script>
+</body>
+</html>
